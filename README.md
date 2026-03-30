@@ -1,1 +1,2 @@
 # real-time-dashboard
+This project is a real-time weather dashboard built using Python and Streamlit. It fetches live weather data from an API and displays it in an interactive web interface with automatic updates and historical trend visualization.
