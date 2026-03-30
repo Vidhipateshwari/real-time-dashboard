@@ -3,33 +3,38 @@ import requests
 import time
 
 REFRESH_INTERVAL = 60
-API_URL = "https://jsonplaceholder.typicode.com/posts"
 
 st.set_page_config(page_title="Real-Time Dashboard", layout="wide")
-st.title("📊 Real-time Data Dashboard")
+st.title("📊 Real-time Weather Dashboard")
 
 if "last_updated" not in st.session_state:
     st.session_state.last_updated = time.time()
 
-# Fetch data
+# Fetch real-time weather
 @st.cache_data(ttl=60)
 def fetch_data():
-    response = requests.get(API_URL)
-    return response.json()[:10]
+    url = "https://api.open-meteo.com/v1/forecast?latitude=22.57&longitude=88.36&current_weather=true"
+    response = requests.get(url)
+    return response.json()
 
 data = fetch_data()
+weather = data["current_weather"]
 
 # Metrics
-col1, col2 = st.columns(2)
-with col1:
-    st.metric("Items Loaded", len(data))
-with col2:
-    st.metric("Refresh Interval", "60 sec")
+col1, col2, col3 = st.columns(3)
 
-# Display data
-st.subheader("📄 Latest Data")
-for item in data:
-    st.write(f"• {item['title']}")
+with col1:
+    st.metric("🌡️ Temperature (°C)", weather["temperature"])
+
+with col2:
+    st.metric("💨 Wind Speed (km/h)", weather["windspeed"])
+
+with col3:
+    st.metric("🧭 Wind Direction", weather["winddirection"])
+
+# Time
+st.subheader("🕒 Last Updated")
+st.write(weather["time"])
 
 # Countdown
 elapsed = int(time.time() - st.session_state.last_updated)
