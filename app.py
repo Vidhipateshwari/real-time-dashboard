@@ -7,7 +7,6 @@ REFRESH_INTERVAL = 60
 st.set_page_config(page_title="Weather Dashboard", layout="wide")
 st.title("📊 Real-time Weather Dashboard (India)")
 
-# Predefined cities (India)
 cities = {
     "Kolkata": (22.57, 88.36),
     "Delhi": (28.61, 77.20),
@@ -33,7 +32,14 @@ def fetch_data(lat, lon):
 data = fetch_data(lat, lon)
 weather = data["current_weather"]
 
-# Metrics
+if "temp_history" not in st.session_state:
+    st.session_state.temp_history = []
+
+st.session_state.temp_history.append(weather["temperature"])
+
+st.session_state.temp_history = st.session_state.temp_history[-20:]
+
+# Components
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -47,6 +53,10 @@ with col3:
 
 st.subheader(f"🕒 Last Updated ({selected_city})")
 st.write(weather["time"])
+
+st.subheader("📈 Temperature Trend")
+
+st.line_chart(st.session_state.temp_history)
 
 # Countdown
 elapsed = int(time.time() - st.session_state.last_updated)
